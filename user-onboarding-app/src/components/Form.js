@@ -6,9 +6,8 @@ function Form () {
     const [formState, setFormState] = useState({ name: "", email: "", password: "", terms: "", role: ""})
     const [buttonDisabled, setButtonDisabled] = useState(true)
     const [errors, setErrors] = useState({name: "", email: "", password: "", terms: "", role: ""})
-    const [post, setPost] = useState([]);
     const [users, setUsers] = useState([]);
-
+    console.log("users", users)
     const validateChange = event => {
         yup
             .reach(formSchema, event.target.name)
@@ -36,8 +35,8 @@ function Form () {
         name: yup.string().required("Name is a required field"),
         email: yup.string().email("Real email addresses only please").required("Must take the risk & include email address. We probably won't spam you."),
         password: yup.string().min(6, "Standard drill: 6 characters password minimum.").required("Nice try. Password required."),
-        terms: yup.boolean().oneOf([true], "Please agree to terms of use & sign your life away."),
-        role: yup.string().oneOf(["dev", "webUI", "backend", "manager"])
+        terms: yup.boolean().oneOf([true], "Please agree to terms of use & sign your life away.").required("Check here, purdy please"),
+        role: yup.string().oneOf(["dev", "webUI", "backend", "manager"]).required("We need to know who you are")
     })
 
     useEffect(() => {
@@ -50,24 +49,16 @@ function Form () {
 
     const formSubmit = event => {
         event.preventDefault();
+        setButtonDisabled(true)//immediately disables button to prevent multiple posts from fast clicking. Similar principle for keeping the user from adding work or text *during the post&* that will be lost once the post finishes.
         axios.post("https://reqres.in/api/users", formState)
-        .then(res => {
-            setPost(res.data);
-            console.log("res.data:", res.data);
-            console.log("success:", post)
-            setFormState({ name: "", email: "", password: "", terms: "", role: ""});
-            setUsers([...users, post]);
-            console.log("users:", users)
-        })
-        .catch((err) => {console.log(err.response)});
+            .then(res => {
+                console.log("res.data:", res.data);
+                setFormState({ name: "", email: "", password: "", terms: "", role: ""});
+                setUsers((users) => [...users, res.data]);//using `users` in the argument here forces it to use the slice of state existing here, instead of the old one that hasnt' been updated w/o a re-render yet. (without using the () => {}, we pull the value of users before this function has run (line 50) which is why it didn't console log the new/current value, but the old value.)
+                //& bc each setter is only aware of it's own value, trying to throw the previous (pointless) post state into setUsers wouldn't work.
+            })
+            .catch((err) => {console.log(err.response)});
     };
-    //I want to do something like this to slow down or repeat lines 55-60. The work about half the time, the other half it goes too fast?? But somehow the semicolons at the end of each line magically make all the difference instead.... my head hurts.
-            // useEffect(() => {
-            //     console.log("res.data:", res.data);
-            //     console.log("success:", post);
-            //     setUsers([...users, post]);
-            //     console.log("users:", users)
-            // }, [post])
 
 
     return(
