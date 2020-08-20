@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react"
+import axios from "axios"
 import * as yup from "yup"
 
 function Form () {
-    const [formState, setFormState] = useState({
-        name: "",
-        email: "",
-        password: "",
-        terms: "",
-        role: ""
-    })
+    const [formState, setFormState] = useState({ name: "", email: "", password: "", terms: "", role: ""})
     const [buttonDisabled, setButtonDisabled] = useState(true)
     const [errors, setErrors] = useState({name: "", email: "", password: "", terms: "", role: ""})
+    const [post, setPost] = useState([]);
+
     const validateChange = event => {
         yup
             .reach(formSchema, event.target.name)
@@ -31,7 +28,7 @@ function Form () {
         validateChange(event)
         setFormState(newFormData)
         // console.log(formState)
-        console.log("ERRORS", errors)
+        // console.log("ERRORS", errors)
     }
 
     const formSchema = yup.object().shape({
@@ -43,14 +40,24 @@ function Form () {
     })
 
     useEffect(() => {
-        console.log("form state change")
+        // console.log("form state change")
         formSchema.isValid(formState).then(valid => {
-            console.log("valid?", valid)
+            // console.log("valid?", valid)
             setButtonDisabled(!valid);
         });
     }, [formState])
 
-    const formSubmit = () => {}
+    const formSubmit = event => {
+        event.preventDefault();
+        axios.post("https://reqres.in/api/users", formState)
+        .then(res => {
+            setPost(res.data);
+            // console.log("res.data:", res.data);
+            // console.log("success:", post);
+            setFormState({ name: "", email: "", password: "", terms: "", role: ""})
+        })
+        .catch((err) => {console.log(err.response)});
+    };
 
     return(
         <form onSubmit={formSubmit}>
