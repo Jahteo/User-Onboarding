@@ -1,23 +1,39 @@
-import React, { useState } from 'react'
-import * as yup from 'yup'
+import React, { useState, useEffect } from "react"
+import * as yup from "yup"
 
 function Form () {
     const [formState, setFormState] = useState({
-        name: '',
-        email: '',
-        password: '',
-        terms: true,
-        role: ''
+        name: "",
+        email: "",
+        password: "",
+        terms: "",
+        role: ""
     })
-    const handleChanges = (event) => {
-        const newFormData = {
-            ...formState, [event.target.name]: event.target.value
-        }
-        // validateChange(event)
-        setFormState(newFormData)
-        console.log(formState)
+    const [buttonDisabled, setButtonDisabled] = useState(true)
+    const [errors, setErrors] = useState({name: "", email: "", password: "", terms: "", role: ""})
+    const validateChange = event => {
+        yup
+            .reach(formSchema, event.target.name)
+            .validate(event.target.name === "terms" ? event.target.checked : event.target.value)
+            .then(valid => {
+                setErrors({...errors, [event.target.name]: ""})
+            })
+            .catch(err => {
+                setErrors({...errors, [event.target.name]: err.errors[0]})
+            })
     }
-    const formSubmit = () => {}
+
+    const handleChanges = (event) => {
+        event.persist();
+        const newFormData = {
+            ...formState, [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value
+        }
+        validateChange(event)
+        setFormState(newFormData)
+        // console.log(formState)
+        console.log("ERRORS", errors)
+    }
+
     const formSchema = yup.object().shape({
         name: yup.string().required("Name is a required field"),
         email: yup.string().email("Real email addresses only please").required("Must take the risk & include email address. We probably won't spam you."),
@@ -26,65 +42,79 @@ function Form () {
         role: yup.string().oneOf(["dev", "webUI", "backend", "manager"])
     })
 
+    useEffect(() => {
+        console.log("form state change")
+        formSchema.isValid(formState).then(valid => {
+            console.log("valid?", valid)
+            setButtonDisabled(!valid);
+        });
+    }, [formState])
+
+    const formSubmit = () => {}
 
     return(
         <form onSubmit={formSubmit}>
-            <label htmlFor='name'>
+            <label htmlFor="name">
                 Name
                 <input
-                    id='name'
-                    type='text'
-                    name='name'
+                    id="name"
+                    type="text"
+                    name="name"
                     value={formState.name}
                     onChange={handleChanges}
                 />
-            </label>
-            <label htmlFor='email'>
+                {errors.name.length > 0 ? <p className="error">{errors.name}</p> : null}
+            </label><br />
+            <label htmlFor="email">
                 Email
                 <input
-                    id='email'
-                    type='text'
-                    name='email'
+                    id="email"
+                    type="text"
+                    name="email"
                     value={formState.email}
                     onChange={handleChanges}
                 />
-            </label>
-            <label htmlFor='password'>
+                 {errors.email.length > 0 ? (<p className="error">{errors.email} </p>) : null}
+            </label><br />
+            <label htmlFor="password">
                 Password
                 <input
-                    id='password'
-                    type='text'
-                    name='password'
+                    id="password"
+                    type="text"
+                    name="password"
                     value={formState.password}
                     onChange={handleChanges}
                 />
-            </label>
-            <label htmlFor='terms'>
+                 {errors.password.length > 0 ? (<p className="error">{errors.password}</p>) : null}
+            </label><br />
+            <label htmlFor="terms">
                 Terms of Service
                 <input
-                    id='terms'
-                    type='checkbox'
-                    name='terms'
+                    id="terms"
+                    type="checkbox"
+                    name="terms"
                     checked={formState.terms}
                     onChange={handleChanges}
                 />
-            </label>
-            <label htmlFor='role'>
+                {errors.terms.length > 0 ? (<p className="error">{errors.terms}</p>) : null}
+            </label><br />
+            <label htmlFor="role">
                 Role
                 <select
-                    id='role'
-                    name='role'
+                    id="role"
+                    name="role"
                     value={formState.role}
                     onChange={handleChanges}
-                >
-                    <option value='init'>--Please choose wisely--</option>
-                    <option value='dev'>Developer Extraordinaire</option>
-                    <option value='webUI'>Web UI Monkey</option>
-                    <option value='backend'>Backend Guru</option>
-                    <option value='manager'>Introvert Wrangler</option>
+                    >
+                    <option value="init">--Please choose wisely--</option>
+                    <option value="dev">Developer Extraordinaire</option>
+                    <option value="webUI">Web UI Monkey</option>
+                    <option value="backend">Backend Guru</option>
+                    <option value="manager">Introvert Wrangler</option>
                 </select>
-            </label>
-            <button type='submit' disabled={true}>Submit</button>
+                {errors.role.length > 0 ? (<p className="error">{errors.role}</p>) : null}
+            </label><br />
+            <button type="submit" disabled={buttonDisabled}>Submit</button>
         </form>
     )
 
