@@ -7,6 +7,7 @@ function Form () {
     const [buttonDisabled, setButtonDisabled] = useState(true)
     const [errors, setErrors] = useState({name: "", email: "", password: "", terms: "", role: ""})
     const [post, setPost] = useState([]);
+    const [users, setUsers] = useState([]);
 
     const validateChange = event => {
         yup
@@ -52,12 +53,22 @@ function Form () {
         axios.post("https://reqres.in/api/users", formState)
         .then(res => {
             setPost(res.data);
-            // console.log("res.data:", res.data);
-            // console.log("success:", post);
-            setFormState({ name: "", email: "", password: "", terms: "", role: ""})
+            console.log("res.data:", res.data);
+            console.log("success:", post)
+            setFormState({ name: "", email: "", password: "", terms: "", role: ""});
+            setUsers([...users, post]);
+            console.log("users:", users)
         })
         .catch((err) => {console.log(err.response)});
     };
+    //I want to do something like this to slow down or repeat lines 55-60. The work about half the time, the other half it goes too fast?? But somehow the semicolons at the end of each line magically make all the difference instead.... my head hurts.
+            // useEffect(() => {
+            //     console.log("res.data:", res.data);
+            //     console.log("success:", post);
+            //     setUsers([...users, post]);
+            //     console.log("users:", users)
+            // }, [post])
+
 
     return(
         <form onSubmit={formSubmit}>
