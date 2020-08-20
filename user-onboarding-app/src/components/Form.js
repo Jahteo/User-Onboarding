@@ -132,7 +132,7 @@ function Form () {
                 </select>
                 {errors.role.length > 0 ? (<p className="error">{errors.role}</p>) : null}
             </label><br />
-            <button type="submit" disabled={buttonDisabled}>Submit</button>
+            <button type="submit" disabled={buttonDisabled}data-cy="submit">Submit</button>
         </form>
     )
 
