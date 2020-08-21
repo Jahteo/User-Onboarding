@@ -60,7 +60,6 @@ function Form () {
             .catch((err) => {console.log(err.response)});
     };
 
-
     return(
         <form onSubmit={formSubmit}>
             <label htmlFor="name">
@@ -83,7 +82,7 @@ function Form () {
                     value={formState.email}
                     onChange={handleChanges}
                 />
-                 {errors.email.length > 0 ? (<p className="error">{errors.email} </p>) : null}
+                    {errors.email.length > 0 ? (<p className="error">{errors.email} </p>) : null}
             </label><br />
             <label htmlFor="password">
                 Password
@@ -94,7 +93,7 @@ function Form () {
                     value={formState.password}
                     onChange={handleChanges}
                 />
-                 {errors.password.length > 0 ? (<p className="error">{errors.password}</p>) : null}
+                    {errors.password.length > 0 ? (<p className="error">{errors.password}</p>) : null}
             </label><br />
             <label htmlFor="terms">
                 Terms of Service
@@ -123,10 +122,10 @@ function Form () {
                 </select>
                 {errors.role.length > 0 ? (<p className="error">{errors.role}</p>) : null}
             </label><br />
-            <button type="submit" disabled={buttonDisabled}data-cy="submit">Submit</button>
+            <button type="submit" disabled={buttonDisabled} data-cy="submit">Submit</button>
+        <pre>{JSON.stringify(users, null, 2)}</pre>
         </form>
     )
-
 }
 
 export default Form
