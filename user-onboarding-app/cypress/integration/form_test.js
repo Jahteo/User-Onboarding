@@ -34,8 +34,31 @@ describe("Form app", () => {
                 .should("be.checked")
         })
 
+        it("can choose a role", () => {
+            cy.get("select[name='role']")
+            .should('have.value', 'init')
+            .select("dev")
+            .should("have.value", "dev")
+        })
 
+        it("can click sumbit button", () => {
+            cy.get("[data-cy='submit']")
+            .should("not.be.disabled")
+            .click()
+        })
 
     })
 
+    describe("testing validation", () => {
+        it("can navigate to http://localhost:3000/", () => {
+            cy.visit("http://localhost:3000/")
+            cy.url().should("include", "localhost")
+        })
+        it("can check email validation", () => {
+            cy.get("input[name='email']")
+                .type("Dogsrulecom")
+            cy.contains("Real email addresses only please")
+        })
+
+    })
 })
